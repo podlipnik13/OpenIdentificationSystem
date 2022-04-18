@@ -1,0 +1,79 @@
+@model IEnumerable<DocumentView>
+
+@{
+  ViewData["Title"] = "Manage Users";
+}
+
+<div class="card">
+  <div class="card-header">
+    <h4>Users</h4>
+  </div>
+  <div class="card-body">
+    <table id="DataTable" class="table">
+      <thead>
+        <tr>
+          <th scope="col">
+            id
+          </th>
+          <th scope="col">
+            Document Name
+          </th>
+          <th scope="col">
+            Validity
+          </th>
+          <th scope="col">
+            Status
+          </th>
+          <th class="text-center" scope="col">
+            <span class="material-icons">manage_accounts</span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach (var docs in Model) {
+          <tr>
+            <th scope="row">
+              @docs.Id
+            </th>
+            <td>
+              @docs.DocumentName
+            </td>
+            <td class="align-middle">
+              <span title="@DateOnly.FromDateTime((DateTime) docs.IssueDate) - @DateOnly.FromDateTime((DateTime) docs.ValidThrough)" 
+                data-bs-toggle="tooltip" data-bs-placement="top" class='badge @Html.Raw(docs.isValid? "bg-success" : "bg-danger" )'>
+                  @Html.Raw(docs.isValid? "Valid" : "Outdated" )
+              </span>
+            </td>
+            <td class="align-middle">
+              @switch (docs.DocumentStatus.ToString()) {
+                case "Declined":
+                  <span class="badge bg-danger">@docs.DocumentStatus</span>
+                  break;
+                case "Accepted":
+                  <span class="badge bg-success">@docs.DocumentStatus</span>
+                  break;
+                case "Pending":
+                  <span class="badge bg-warning">@docs.DocumentStatus</span>
+                  break;
+              }
+            </td>
+            <td class="text-center">
+              <div class="btn-group" role="group">
+                <a asp-action="UserDocumentEdit" asp-controller="Users" asp-route-id="@docs.Id"
+                  type="button" class="btn btn-primary material-icons">edit</a>
+                <a asp-action="UserDelete" asp-controller="Users" asp-route-id="@docs.Id"
+                  type="button" class="btn btn-danger material-icons">delete_forever</a>
+              </div>
+            </td>
+          </tr>
+        }
+        <tr>
+          <td colspan="6">
+            <a asp-controller="Users" asp-action="UserCreate" 
+              class="btn btn-success material-icons" type="button">add</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

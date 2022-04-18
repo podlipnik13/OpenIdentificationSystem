@@ -1,0 +1,4 @@
+- remove cascade delete
+- add aft validation
+- add logger
+   

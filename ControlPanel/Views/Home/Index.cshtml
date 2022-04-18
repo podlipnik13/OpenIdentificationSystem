@@ -1,0 +1,13 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+@{
+    
+    Func<(string FirstName, string LastName, int Age), object> person =
+    @<p>@item.FirstName @item.LastName is @item.Age years old.</p>;
+}
+
+
+
+@person(("John", "Doe", 30))

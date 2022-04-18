@@ -1,0 +1,59 @@
+@model User
+
+@{
+    ViewData["Title"] = "Add User";
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <h4 class="col-11">Add new user</h4>
+            <a asp-action="Index" asp-controller="Users"
+               type="button" class="btn-close"></a>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <form asp-action="UserCreate" asp-controller="Users">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="row align-items-center">
+                <div class="col-6">
+                    <label asp-for="@Model.UserName" class="form-label"></label>
+                    <input asp-for="@Model.UserName" class="form-control" type="text" />
+                </div>
+                <div class="col-6">
+                    <label asp-for="@Model.Email" class="form-label"></label>
+                    <input asp-for="@Model.Email" class="form-control" type="text" />
+                </div>
+            </div>
+            <br>
+            <div class="row align-items-center">
+                <div class="col-6">
+                    <label asp-for="@Model.UserGroup" class="form-label"></label>
+                    <select asp-for="@Model.UserGroup" asp-items="Html.GetEnumSelectList<UserGroup>()"
+                        class="form-select">
+                        <option selected>@UserGroup.Default</option>
+                    </select>
+                </div>
+                <div class="col-6">
+                    <label asp-for="@Model.Status" class="form-label"></label>
+                    <select asp-for="@Model.Status" asp-items="Html.GetEnumSelectList<Status>()"
+                        class="form-select">
+                        <option selected>@Status.Pending</option>    
+                    </select>
+                </div>
+            </div>
+            <br>
+             <div class="">
+                <div class="text-end">
+                    <button asp-controller="Users" asp-action="UserCreate"
+                     class="btn btn-primary" type="submit">
+                        Submit
+                        <span class="badge material-icons" style="top: 0 !important;">check</span>
+                    </button>
+                </div>
+             </div>
+        </form>
+    </div>
+</div>

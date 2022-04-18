@@ -1,0 +1,96 @@
+﻿@model IEnumerable<User>
+
+@{
+  ViewData["Title"] = "Manage Users";
+}
+
+<div class="card">
+  <div class="card-header">
+    <h4>Users</h4>
+  </div>
+  <div class="card-body">
+    <table id="DataTable" class="table">
+      <thead>
+        <tr>
+          <th scope="col">
+            @Html.DisplayNameFor(m => m.Id)
+          </th>
+          <th scope="col">
+            @Html.DisplayNameFor(m => m.UserName)
+          </th>
+          <th scope="col">
+            @Html.DisplayNameFor(m => m.UserGroup)
+          </th>
+          <th scope="col">
+            @Html.DisplayNameFor(m => m.Status)
+          </th>
+          <th class="text-center" scope="col">
+            <span class="material-icons">wysiwyg</span>
+          </th>
+          <th class="text-center" scope="col">
+            <span class="material-icons">manage_accounts</span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach (var user in Model) {
+          <tr>
+            <th scope="row">
+              @Html.DisplayFor(m => user.Id)
+            </th>
+            <td>
+              @Html.DisplayFor(m => user.UserName)
+            </td>
+            <td class="align-middle">
+              @switch (user.UserGroup.ToString()) {
+                case "Admin":
+                  <span class="badge bg-danger">@Html.DisplayFor(m => user.UserGroup)</span>
+                  break;
+                case "Inspector":
+                  <span class="badge bg-primary">@Html.DisplayFor(m => user.UserGroup)</span>
+                  break;
+                case "Inspectee":
+                  <span class="badge bg-secondary">@Html.DisplayFor(m => user.UserGroup)</span>
+                  break;
+                case "Default":
+                  <span class="badge bg-info">@Html.DisplayFor(m => user.UserGroup)</span>
+                  break;
+              }
+            </td>
+            <td class="align-middle">
+              @switch (user.Status.ToString()) {
+                case "Declined":
+                  <span class="badge bg-danger">@Html.DisplayFor(m => user.Status)</span>
+                  break;
+                case "Accepted":
+                  <span class="badge bg-success">@Html.DisplayFor(m => user.Status)</span>
+                  break;
+                case "Pending":
+                  <span class="badge bg-warning">@Html.DisplayFor(m => user.Status)</span>
+                  break;
+              }
+            </td>
+            <td class="text-center">
+              <a asp-action="UserDocuments" asp-controller="Users" asp-route-id="@user.Id"
+                  type="button" class="btn btn-secondary material-icons">view_list</a>
+            </td>
+            <td class="text-center">
+              <div class="btn-group" role="group">
+                <a asp-action="UserEdit" asp-controller="Users" asp-route-id="@user.Id"
+                  type="button" class="btn btn-primary material-icons">edit</a>
+                <a asp-action="UserDelete" asp-controller="Users" asp-route-id="@user.Id"
+                  type="button" class="btn btn-danger material-icons">delete_forever</a>
+              </div>
+            </td>
+          </tr>
+        }
+        <tr>
+          <td colspan="6">
+            <a asp-controller="Users" asp-action="UserCreate" 
+              class="btn btn-success material-icons" type="button">add</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

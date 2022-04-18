@@ -1,0 +1,65 @@
+﻿@model IEnumerable<DocumentType>
+
+@{
+    ViewData["Title"] = "Manage Documents";
+}
+
+<div class="card">
+   <div class="card-header">
+      <h4>Documents Types</h4>
+   </div>
+   <div class="card-body">
+      <table class="table">
+         <thead>
+            <tr>
+               <th scope="col">
+                  @Html.DisplayNameFor(m => m.Id)
+               </th>
+               <th scope="col">
+                  @Html.DisplayNameFor(m => m.Label)
+               </th>
+               <th class="text-center" scope="col">
+                  <span class="material-icons">manage_accounts</span>
+               </th>
+            </tr>
+         </thead>
+         <tbody>
+            @foreach (var documentType in Model) {
+            <tr>
+               <th scope="row">
+                  @documentType.Id
+               </th>
+               <td class="">
+                  @documentType.Label
+               </td>
+               <td class="text-center">
+                  <div class="btn-group" role="group">
+                     <a asp-route-id="@documentType.Id" asp-controller="Documents" asp-action="TypeEdit"
+                        class="btn btn-primary material-icons" type="button"> edit </a>
+                     <a class="btn btn-danger material-icons" type="button" 
+                        href="javascript:deleteConfirm(@documentType.Id)"> delete_forever </a>
+                  </div>
+               </td>
+            </tr>
+            }
+            <tr>
+               <td colspan="6">
+                  <a asp-controller="Documents" asp-action="TypeCreate"
+                     class="btn btn-success material-icons" type="button">add </a>
+               </td>
+            </tr>
+         </tbody>
+      </table>
+   </div>
+</div>
+
+<script>
+   function deleteConfirm(id){
+
+      var url = '@(Url.Action("TypeDelete","Documents"))' + "/" + id;
+      $('#confirmmodal-ok').attr('href',url)
+
+      $('#confirmmodal').modal('show');
+   }
+</script>
+        
