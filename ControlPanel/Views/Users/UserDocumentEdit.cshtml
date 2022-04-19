@@ -1,0 +1,54 @@
+@model IEnumerable<DocumentParameterValueView>
+
+@{
+    ViewData["Title"] = "Edit Document";
+}
+
+<div class="card">
+   <div class="card-header">
+      <h4>
+         Edit Document
+      </h4>
+   </div>
+   <div class="card-body">
+      <table class="table">
+         <thead>
+            <tr>
+               <th scope="col">
+                  @Html.DisplayNameFor(m => m.Id)
+               </th>
+               <th scope="col">
+                  @Html.DisplayNameFor(m => m.ParameterName)
+               </th>
+               <th scope="col">
+                  @Html.DisplayNameFor(m => m.ParameterValue)
+               </th>
+               <th class="text-center" scope="col">
+                  <span class="material-icons">manage_accounts</span>
+               </th>
+            </tr>
+         </thead>
+         <tbody>
+            @foreach (var docParam in Model) {
+            <tr>
+               <th scope="row">
+                  @docParam.Id
+               </th>
+               <td class="">
+                  @docParam.ParameterName
+               </td>
+               <td class="">
+                  @docParam.ParameterValue
+               </td>
+               <td class="text-center">
+                  <div class="btn-group" role="group">
+                     <a asp-route-id="@docParam.Id" asp-controller="Users" asp-action="ParameterValueEdit"
+                        class="btn btn-primary material-icons" type="button"> edit </a>
+                  </div>
+               </td>
+            </tr>
+            }
+         </tbody>
+      </table>
+   </div>
+</div>

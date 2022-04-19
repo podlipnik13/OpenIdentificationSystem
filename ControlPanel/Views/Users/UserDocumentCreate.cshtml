@@ -1,0 +1,69 @@
+@model Document
+
+
+@{
+    ViewData["Title"] = "Add User";
+}
+
+
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <h4 class="col-11">Add new document to /User/</h4>
+            <a asp-action="Index" asp-controller="Users"
+               type="button" class="btn-close"></a>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <form asp-action="UserCreate" asp-controller="Users">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="row align-items-center">
+                <div class="col-4">
+                    <label asp-for="@Model.DocumentType" class="form-label"></label>
+                    <select asp-for="@Model.DocumentType"
+                        class="form-select">
+                        <option selected></option>
+                    </select>
+                </div>
+                <div class="col-4">
+                  <label asp-for="@Model.IssueDate" class="form-label"></label>
+                  <div class="input-group ">
+                     <i class="material-icons input-group-text">edit_calendar</i>
+                     <input type="text" class="datepicker_input form-control" placeholder="" required
+                        aria-label="Issue date">
+                  </div>
+                </div>
+                <div class="col-4">
+                  <label asp-for="@Model.ValidThrough" class="form-label"></label>
+                  <div class="input-group">
+                     <i class="material-icons input-group-text">edit_calendar</i>
+                     <input type="text" class="datepicker_input form-control" placeholder="" required
+                        aria-label="Valid through">
+                  </div>
+                </div>
+                <div class="col-4">
+                    <label asp-for="@Model.DocumentStatus" class="form-label"></label>
+                    <select asp-for="@Model.DocumentStatus" asp-items="Html.GetEnumSelectList<DocumentStatus>()"
+                        class="form-select">
+                        <option selected>@DocumentStatus.Pending</option>
+                    </select>
+                </div>
+            </div>
+            <br>
+             <div class="">
+                <div class="text-end">
+                    <button asp-controller="Users" asp-action="UserCreate"
+                     class="btn btn-primary" type="submit">
+                        Submit
+                        <i class="badge material-icons" style="top: 0 !important;">check</i>
+                    </button>
+                </div>
+             </div>
+        </form>
+    </div>
+</div>
+
+<partial name="~/Views/Shared/_datepicker.cshtml"/>
