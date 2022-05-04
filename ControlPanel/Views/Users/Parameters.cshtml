@@ -1,0 +1,67 @@
+@model PaginatedList<DocumentParameterValueView>
+
+@{
+  ViewData["Title"] = "Manage Documents";
+}
+
+@if (ViewData["ErrMsg"] != null){
+   <div class="alert alert-danger" role="alert"> @ViewData["ErrMsg"].ToString() </div>
+}
+
+<div class="card">
+  <div class="card-header">
+    <div class="row" style="align-items: center;">
+      <h4 class="col-10" style="margin-bottom: 0px;" >@Html.Raw(ViewData["UserName"]??"User")</h4>
+    </div>
+  </div>
+  <div class="card-body">
+    <table id="DataTable" class="table">
+      <thead>
+        <tr>
+          <th scope="col">
+            Id
+          </th>
+          <th scope="col">
+            Parameter name
+          </th>
+          <th class="text-center" scope="col">
+            <span class="material-icons">settings</span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach (var param in Model) {
+          <tr>
+            <th class="align-middle" scope="row">
+              @param.Id
+            </th>
+            <td class="align-middle">
+              @param.ParameterName
+            </td>
+             <td class="align-middle">
+              @param.ParameterValue
+            </td>
+            <td class="text-center">
+              <a asp-action="DocumentParameters" asp-controller="Users" asp-route-id="@param.Id" 
+              type="button" class="btn btn-primary material-icons">edit</a>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <div class="card-footer">
+      @{
+          var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+          var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+      }
+      <div class="btn-group float-start">
+        <a asp-action="Index" asp-controller="Users" 
+          asp-route-pageNumber="@(Model.PageIndex - 1)" asp-route-pageSize=""
+          class="btn btn-secondary material-icons @prevDisabled">chevron_left</a>
+        <a asp-action="Index" asp-controller="Users" 
+          asp-route-pageNumber="@(Model.PageIndex + 1)" asp-route-pageSize=""
+          class="btn btn-secondary material-icons @nextDisabled">chevron_right</a>
+      </div>
+  </div>
+</div>

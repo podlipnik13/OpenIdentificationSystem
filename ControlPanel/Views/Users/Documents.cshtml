@@ -1,19 +1,25 @@
-@model IEnumerable<DocumentView>
+@model PaginatedList<DocumentView>
 
 @{
-  ViewData["Title"] = "Manage Users";
+  ViewData["Title"] = "Manage Documents";
+}
+
+@if (ViewData["ErrMsg"] != null){
+   <div class="alert alert-danger" role="alert"> @ViewData["ErrMsg"].ToString() </div>
 }
 
 <div class="card">
   <div class="card-header">
-    <h4>Users</h4>
+    <div class="row" style="align-items: center;">
+      <h4 class="col-10" style="margin-bottom: 0px;" >@Html.Raw(ViewData["UserName"]??"User")</h4>
+    </div>
   </div>
   <div class="card-body">
     <table id="DataTable" class="table">
       <thead>
         <tr>
           <th scope="col">
-            id
+            Id
           </th>
           <th scope="col">
             Document Name
@@ -25,17 +31,20 @@
             Status
           </th>
           <th class="text-center" scope="col">
-            <span class="material-icons">manage_accounts</span>
+            <span class="material-icons">wysiwyg</span>
+          </th>
+          <th class="text-center" scope="col">
+            <span class="material-icons">settings</span>
           </th>
         </tr>
       </thead>
       <tbody>
         @foreach (var docs in Model) {
           <tr>
-            <th scope="row">
+            <th class="align-middle" scope="row">
               @docs.Id
             </th>
-            <td>
+            <td class="align-middle">
               @docs.DocumentName
             </td>
             <td class="align-middle">
@@ -58,22 +67,38 @@
               }
             </td>
             <td class="text-center">
+              <a asp-action="Parameters" asp-controller="Users" asp-route-id="@docs.Id" type="button"
+              class="btn btn-secondary material-icons">visibility</a>
+            </td>
+            <td class="text-center">
               <div class="btn-group" role="group">
-                <a asp-action="UserDocumentEdit" asp-controller="Users" asp-route-id="@docs.Id"
+                <a asp-action="DocumentAddOrEdit" asp-controller="Users" asp-route-id="@docs.Id"
                   type="button" class="btn btn-primary material-icons">edit</a>
-                <a asp-action="UserDelete" asp-controller="Users" asp-route-id="@docs.Id"
+                <a asp-action="DocumentDelete" asp-controller="Users" asp-route-id="@docs.Id"
                   type="button" class="btn btn-danger material-icons">delete_forever</a>
               </div>
             </td>
           </tr>
         }
-        <tr>
-          <td colspan="6">
-            <a asp-controller="Users" asp-action="UserDocumentCreate" asp-route-id="4"
-              class="btn btn-success material-icons" type="button">add</a>
-          </td>
-        </tr>
       </tbody>
     </table>
+  </div>
+  <div class="card-footer">
+      @{
+          var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+          var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+      }
+      <div class="btn-group float-start">
+        <a asp-action="Index" asp-controller="Users" 
+          asp-route-pageNumber="@(Model.PageIndex - 1)" asp-route-pageSize=""
+          class="btn btn-secondary material-icons @prevDisabled">chevron_left</a>
+        <a asp-action="Index" asp-controller="Users" 
+          asp-route-pageNumber="@(Model.PageIndex + 1)" asp-route-pageSize=""
+          class="btn btn-secondary material-icons @nextDisabled">chevron_right</a>
+      </div>
+      <div class="float-end">
+        <a asp-action="DocumentAddOrEdit" asp-controller="Users" asp-route-userId='@ViewData["UserId"]'
+              class="btn btn-success" type="button">Add new</a>
+      </div>
   </div>
 </div>

@@ -1,14 +1,18 @@
-﻿@model PaginatedList<DocumentType>
+﻿@model PaginatedList<DocumentParameter>
 
 @{
-  ViewData["Title"] = "Manage Document Types";
+  ViewData["Title"] = "Manage Parameters";
+}
+
+@if (ViewData["ErrMsg"] != null){
+   <div class="alert alert-danger" role="alert"> @ViewData["ErrMsg"].ToString() </div>
 }
 
 <div class="card">
   <div class="card-header">
-    <div class="row" style="align-items: center;">
-      <h4 class="col-10" style="margin-bottom: 0px;" >Document types</h4>
-    </div>
+    <h4 class="float-start" style="margin-bottom: 0px;" > Title </h4>
+    <a asp-action="Index" asp-controller="Documents" 
+      type="button" class="float-end btn-close"></a>
   </div>
   <div class="card-body">
     <table id="DataTable" class="table">
@@ -18,34 +22,40 @@
             Id
           </th>
           <th scope="col">
-            Label
+            Parameter name
+          </th>
+          <th scope="col">
+            Data type
+          </th>
+          <th scope="col">
+            Identifier
           </th>
           <th class="text-center" scope="col">
-            <span class="material-icons">wysiwyg</span>
-          </th>
-          <th class="text-center" scope="col">
-            <span class="material-icons">manage_accounts</span>
+            <span class="material-icons">settings</span>
           </th>
         </tr>
       </thead>
       <tbody>
-        @foreach (var docType in Model) {
+        @foreach (var param in Model) {
           <tr>
             <th class="align-middle" scope="row">
-              @Html.DisplayFor(m => docType.Id)
+              @param.Id
             </th>
             <td class="align-middle">
-              @Html.DisplayFor(m => docType.Label)
+              @param.Label
             </td>
-            <td class="text-center">
-              <a asp-action="Parameters" asp-controller="Documents" asp-route-id="@docType.Id"
-                  type="button" class="btn btn-secondary material-icons">visibility</a>
+            <td class="align-middle">
+              @param.DataType
+            </td>
+            <td class="align-middle">
+               <span class="material-icons" style='@Html.Raw(param.isIdentifier?"color: green;":"")'>
+                  @Html.Raw( param.isIdentifier? "check_box":"check_box_outline_blank")</span>
             </td>
             <td class="text-center">
               <div class="btn-group" role="group">
-                <a asp-action="DocumentTypeAddOrEdit" asp-controller="Documents" asp-route-id="@docType.Id"
+                <a asp-action="ParameterAddOrEdit" asp-controller="Documents" asp-route-id="@param.Id"
                   type="button" class="btn btn-primary material-icons">edit</a>
-                <a asp-action="DocumentTypeDelete" asp-controller="Documents" asp-route-id="@docType.Id"
+                <a asp-action="ParameterDelete" asp-controller="Documents" asp-route-id="@param.Id"
                   type="button" class="btn btn-danger material-icons">delete_forever</a>
               </div>
             </td>
@@ -60,15 +70,15 @@
           var nextDisabled = !Model.HasNextPage ? "disabled" : "";
       }
       <div class="btn-group float-start">
-        <a asp-action="Index" asp-controller="Documents" 
+        <a asp-action="Parameters" asp-controller="Documents" 
           asp-route-pageNumber="@(Model.PageIndex - 1)" asp-route-pageSize=""
           class="btn btn-secondary material-icons @prevDisabled">chevron_left</a>
-        <a asp-action="Index" asp-controller="Documents" 
+        <a asp-action="Parameters" asp-controller="Documents" 
           asp-route-pageNumber="@(Model.PageIndex + 1)" asp-route-pageSize=""
           class="btn btn-secondary material-icons @nextDisabled">chevron_right</a>
       </div>
       <div class="float-end">
-        <a asp-action="DocumentTypeAddOrEdit" asp-controller="Documents" 
+        <a asp-action="ParameterAddOrEdit" asp-controller="Documents" asp-route-typeid='@ViewData["TypeId"]'
               class="btn btn-success" type="button">Add new</a>
       </div>
   </div>

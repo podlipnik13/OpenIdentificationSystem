@@ -2,20 +2,26 @@
 
 
 @{
-    ViewData["Title"] = "Edit Document Parameter";
-}
+   ViewData["Title"] = "Add or Edit User";
 
+   if (!string.IsNullOrEmpty(Convert.ToString(ViewData["EditError"])))
+   {
+      <div class="alert alert-danger" role="alert">
+         @Convert.ToString(ViewData["EditError"])
+      </div>
+   }
+}
 <div class="card">
     <div class="card-header">
         <div class="row">
-            <h4 class="col-11">Edit - @Model.UserName</h4>
+            <h4 class="col-11">Title</h4>
             <a asp-action="Index" asp-controller="Users"
                type="button" class="btn-close"></a>
         </div>
     </div>
 
     <div class="card-body">
-        <form asp-action="EditUser" asp-controller="Users">
+        <form id="form" asp-action="AddOrEditUser" asp-controller="Users">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             
             <div class="row align-items-center">
@@ -41,16 +47,10 @@
                         class="form-select"></select>
                 </div>
             </div>
-            <br>
-             <div class="">
-                <div class="text-end">
-                    <button asp-controller="Users" asp-action="UserEdit" asp-route-id="@Model.Id"
-                     class="btn btn-primary" type="submit">
-                        Submit
-                        <span class="badge material-icons" style="top: 0 !important;">check</span>
-                    </button>
-                </div>
-             </div>
         </form>
     </div>
+   <div class="card-footer">
+      <button asp-controller="Users" asp-action="UserAddOrEdit" 
+         class="btn btn-primary float-end" form="form" type="submit"> Submit </button>
+  </div>
 </div>

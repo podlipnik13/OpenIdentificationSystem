@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace ControlPanel.Controllers;
@@ -10,127 +11,216 @@ public class UsersController : Controller {
         _context = context;
     }
 
-
-#region Users
+    private Exception NotFound(string s){
+        return new( $"{s} not found!");
+    }
+    private int PageSize = 5; 
+        
+    #region User
     
-    public async Task<IActionResult> Index() {
-        return View(await _context.Users.ToListAsync());
-    }
+    [HttpGet]
+    public async Task<IActionResult> Index(int? pageNumber, int? pageSize){
+        return View(await PaginatedList<User>.CreateAsync(_context.Users.AsNoTracking(), 
+            pageNumber ?? 1, // return the value of pageNumber if it has value, or return 1 if pageNumber is null. 
+            pageSize ?? PageSize));
+    }    
 
     [HttpGet]
-    public IActionResult UserCreate() {
-        return View();
-    }
+    public async Task<IActionResult> UserAddOrEdit(int? id){
 
-    [HttpPost]
-    //[ValidateAntiForgeryToken]
-    public async Task<IActionResult> UserCreate(
-        [Bind("UserName,Documents,Email,Status,UserGroup")] User usr) {
+        User user = id==null? new():await _context.Users
+            .FirstOrDefaultAsync(u => u.Id == id);
+
+        if(user == null) return NotFound();
         
-        try {
-            if (ModelState.IsValid) {
-                
-                var user = new User {
-                    UserName = usr.UserName,
-                    Documents = usr.Documents,
-                    Email = usr.Email,
-                    Status = usr.Status,
-                    UserGroup = usr.UserGroup               
-                };
-
-                _context.Users.Add(user);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-        } catch (Exception ex) {
-            // log exception
-        }
-        return View();
-    }
-    [HttpGet]
-    public async Task<IActionResult> UserEdit(int? id) {
-        
-        if (id is null) return NotFound();
-
-        var user = await _context.Users
-            .FirstOrDefaultAsync(d => d.Id == id);
-
         return View(user);
-    }
+     }
+    
     
     [HttpPost]
-    public async Task<IActionResult> UserEdit(int id){
+    public async Task<IActionResult> UserAddOrEdit(User res){
+
+        User user = await _context.Users
+            .FirstOrDefaultAsync(u => u.Id == res.Id);
         
-        var user = await _context.Users
-                .FirstOrDefaultAsync(d => d.Id == id);
+        try{
+            if(ModelState.IsValid){
+                if(user == null){
+                    
+                    user = new(){
+                        UserName = res.UserName,
+                        Email = res.Email,
+                        Status = res.Status,
+                        UserGroup = res.UserGroup
+                    };
+                    
+                    _context.Users.Add(user);
 
+                }else{
+                    
+                    user.UserName = res.UserName;
+                    user.Email = res.Email;
+                    user.Status = res.Status;
+                    user.UserGroup = res.UserGroup;
 
-        if (await TryUpdateModelAsync<User>( user, "", 
-            u => u.UserName,
-            u => u.UserGroup,
-            u => u.Status,
-            u => u.Email
-            )){
-                try {
-                    await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
-                }catch (Exception ex){
-                    //log
-                }      
+                    _context.Users.Update(user);
+                }
+            }
+            
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Index");
+
+        }catch(Exception ex){
+            ViewData["ErrMsg"] = ex.Message;
         }
-        return View(NotFound());
+        return View(res);
     }
-    
-    [HttpGet]
-    public async Task<IActionResult> UserDelete(int id) {
-        
-        var user = await _context.Users.FindAsync(id);
 
-        if (user is null) return NotFound();
+    [HttpGet]
+    public async Task<IActionResult> UserDelete(int? id){
+
+        if(id == null) return NotFound();
+        
+        User user = await _context.Users
+            .FindAsync(id);
 
         try {
+        
+            if (user == null) throw NotFound("User");
+
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+        }catch (Exception ex) {
+            ViewData["ErrMsg"] = ex.Message;
         }
-        catch (Exception ex) {
-            ViewData["ErrorMessage"] = ex.Message;
-            //log 
-        }
-        return View(NotFound());
+
+        return RedirectToAction("Index");
     }
 
-#endregion
+    #endregion
 
-#region User Documents
+    #region Documents
 
     [HttpGet]
-    public async Task<IActionResult> UserDocuments(int? id) {
+    public async Task<IActionResult> Documents(int? id, int? pageNumber, int? pageSize) {
         
         if (id is null) return NotFound();
-
-        var userDocs = await _context.Documents
+        
+        
+        ViewData["UserId"] = id;
+        ViewData["UserName"] = _context.Users.FirstOrDefault(u => u.Id == id).UserName;
+        
+        var documentView = await PaginatedList<DocumentView>.CreateAsync(_context.Documents 
             .Where(d => d.UserId == id)
-            .Select(d => new DocumentView{
+            .Select(d => new DocumentView {
                 Id = d.Id,
-                UserId = d.UserId,
-                DocumentName= d.DocumentType.Label,
+                DocumentName = d.DocumentType.Label,
                 IssueDate = d.IssueDate,
                 ValidThrough = d.ValidThrough,
                 DocumentTypeId = d.DocumentTypeId,
                 DocumentStatus = d.DocumentStatus
-            })
-            .ToListAsync();
-        
-        return View(userDocs);
+            }).AsNoTracking(),
+            pageNumber ?? 1, 
+            pageSize ?? PageSize
+        );
+
+        return View(documentView);
     }
 
     [HttpGet]
-    public async Task<IActionResult> UserDocumentEdit(int? id) {
+    public async Task<IActionResult> DocumentAddOrEdit(int? id, int? userId){
+
+        Document document = id.HasValue? await _context.Documents
+            .FirstOrDefaultAsync(u => u.Id == id): new(){
+                UserId = (int)userId};
+
+        if(document == null) return NotFound();
+      
+        ViewData["DocumentTypesList"] = new SelectList(await _context.DocumentTypes.ToListAsync(),"Id","Label", document.DocumentTypeId);
+        
+        return View(document);
+     }
+    
+    
+    [HttpPost]
+    public async Task<IActionResult> DocumentAddOrEdit(Document res){
+
+        Document document = await _context.Documents
+            .FirstOrDefaultAsync(u => u.Id == res.Id);
+        
+        try{
+            if(ModelState.IsValid){
+                if(document == null){
+                    
+                    document = new(){
+                        UserId = res.UserId,
+                        DocumentTypeId = res.DocumentTypeId,
+                        DocumentStatus = res.DocumentStatus,
+                        IssueDate = DateTime.SpecifyKind(res.IssueDate, DateTimeKind.Utc),
+                        ValidThrough = DateTime.SpecifyKind(res.ValidThrough, DateTimeKind.Utc),
+                    };
+                    
+                    _context.Documents.Add(document);
+                }else{
+                    
+                    document.DocumentTypeId = res.DocumentTypeId;
+                    document.DocumentStatus = res.DocumentStatus;
+                    document.IssueDate = DateTime.SpecifyKind(res.IssueDate, DateTimeKind.Utc);
+                    document.ValidThrough = DateTime.SpecifyKind(res.ValidThrough, DateTimeKind.Utc);
+
+                    _context.Documents.Update(document);
+                }
+            }
+            
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Documents", new { id = document.UserId });
+
+        }catch(Exception ex){
+            ViewData["ErrMsg"] = ex.Message;
+        }
+        
+        ViewData["DocumentTypesList"] = new SelectList(await _context.DocumentTypes.ToListAsync(),"Id","Label", document.DocumentTypeId);
+        return View(res);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> DocumentDelete(int? id){
+
+        if(id == null) return NotFound();
+        
+        Document document = await _context.Documents
+            .FindAsync(id);
+
+        try {
+        
+            if (document == null) throw NotFound("Document");
+
+            _context.Documents.Remove(document);
+            await _context.SaveChangesAsync();
+
+        }catch (Exception ex) {
+            ViewData["ErrMsg"] = ex.Message;
+        }
+
+        return RedirectToAction("Documents", new { id = document.UserId });
+    }
+  
+    #endregion
+
+    #region Parameters
+
+    [HttpGet]
+    public async Task<IActionResult> Parameters(int? id, int? pageNumber, int? pageSize) {
         
         if (id is null) return NotFound();
+        
+        var typeid = _context.Documents.Where(d => d.Id == id)
+        .Select(dt => dt.DocumentTypeId).First();
 
-        var userDocParams = await _context.DocumentParameterValues
+        var docparams = _context.DocumentParameters
+            .Where(dp => dp.DocumentTypeId == typeid).ToArray();
+            var documentView = await _context.DocumentParameterValues
             .Where(dp => dp.DocumentId == id)
             .Select(dp => new DocumentParameterValueView{
                 Id = dp.Id,
@@ -139,77 +229,66 @@ public class UsersController : Controller {
             })
             .ToListAsync();
 
-        return View(userDocParams);
+        return View(documentView);
     }
 
     [HttpGet]
-    public IActionResult UserDocumentCreate() {
-        return View();
-    }
+    public async Task<IActionResult> ParameterEdit(int? id, int? userId){
 
-    /*
-    [HttpPost]
-    //[ValidateAntiForgeryToken]
-    public async Task<IActionResult> UserDocumentCreate(
-        [Bind("UserName,Documents,Email,Status,UserGroup")] User usr) {
+        Document document = id.HasValue? await _context.Documents
+            .FirstOrDefaultAsync(u => u.Id == id): new(){
+                UserId = (int)userId};
+
+        if(document == null) return NotFound();
+      
+        ViewData["DocumentTypesList"] = new SelectList(await _context.DocumentTypes.ToListAsync(),"Id","Label", document.DocumentTypeId);
         
-        try {
-            if (ModelState.IsValid) {
-                
-                var user = new User {
-                    UserName = usr.UserName,
-                    Documents = usr.Documents,
-                    Email = usr.Email,
-                    Status = usr.Status,
-                    UserGroup = usr.UserGroup               
-                };
+        return View(document);
+     }
+    
+    
+    [HttpPost]
+    public async Task<IActionResult> ParameterEdit(Document res){
 
-                _context.Users.Add(user);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+        Document document = await _context.Documents
+            .FirstOrDefaultAsync(u => u.Id == res.Id);
+        
+        try{
+            if(ModelState.IsValid){
+                if(document == null){
+                    
+                    document = new(){
+                        UserId = res.UserId,
+                        DocumentTypeId = res.DocumentTypeId,
+                        DocumentStatus = res.DocumentStatus,
+                        IssueDate = DateTime.SpecifyKind(res.IssueDate, DateTimeKind.Utc),
+                        ValidThrough = DateTime.SpecifyKind(res.ValidThrough, DateTimeKind.Utc),
+                    };
+                    
+                    _context.Documents.Add(document);
+
+                }else{
+                    
+                    document.DocumentTypeId = res.DocumentTypeId;
+                    document.DocumentStatus = res.DocumentStatus;
+                    document.IssueDate = DateTime.SpecifyKind(res.IssueDate, DateTimeKind.Utc);
+                    document.ValidThrough = DateTime.SpecifyKind(res.ValidThrough, DateTimeKind.Utc);
+
+                    _context.Documents.Update(document);
+                }
             }
-        } catch (Exception ex) {
-            // log exception
+            
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Documents", new { id = document.UserId });
+
+        }catch(Exception ex){
+            ViewData["ErrMsg"] = ex.Message;
         }
-        return View();
-    }
-    
-    */
-
         
-    [HttpGet]
-    public async Task<IActionResult> ParameterValueEdit(int? id) {
-        
-        if (id is null) return NotFound();
-
-        var userDocParam = await _context.DocumentParameterValues
-            .Include(dp => dp.DocumentParameter)
-            .FirstOrDefaultAsync(pv => pv.Id == id);
-        
-
-
-        return View(userDocParam);
+        ViewData["DocumentTypesList"] = new SelectList(await _context.DocumentTypes.ToListAsync(),"Id","Label", document.DocumentTypeId);
+        return View(res);
     }
 
-    [HttpPost]
-    public async Task<IActionResult> ParameterValueEdit(int id) {
-    
-        var userDocParam = await _context.DocumentParameterValues
-            .FirstOrDefaultAsync(pv => pv.Id == id);
-        
-        if (await TryUpdateModelAsync<DocumentParameterValue>(
-                userDocParam, "", dp => dp.ParameterValue)){
-                
-                try {
-                    await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
-                }catch (Exception ex){
-                    //log
-                }      
-        }
-        return View(NotFound());
-    }
-    
-#endregion
+    #endregion
 
 }
