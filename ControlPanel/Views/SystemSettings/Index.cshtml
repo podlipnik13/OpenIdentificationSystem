@@ -1,0 +1,54 @@
+@model IEnumerable<SystemParameter>
+
+@{
+  ViewData["Title"] = "Manage system parameters";
+}
+
+<div class="card">
+  <div class="card-header">
+    <div class="row" style="align-items: center;">
+      <h4 class="col-10" style="margin-bottom: 0px;" >System parameters</h4>
+    </div>
+  </div>
+  <div class="card-body">
+    <table id="DataTable" class="table">
+      <thead>
+        <tr>
+          <th scope="col">
+            Id
+          </th>
+          <th scope="col">
+            Label
+          </th>
+          <th scope="col">
+            Value
+          </th>
+          <th class="text-center" scope="col">
+            <span class="material-icons">settings</span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach (var param in Model) {
+          <tr>
+            <th class="align-middle" scope="row">
+              @Html.DisplayFor(m => param.Id)
+            </th>
+            <td class="align-middle">
+              @Html.DisplayFor(m => param.Property)
+            </td>
+            <td class="align-middle">
+              @Html.DisplayFor(m => param.Value)
+            </td>
+            <td class="text-center">
+              <a asp-action="SystemParameterEdit" asp-controller="SystemSettings" asp-route-id="@param.Id"
+                  type="button" class="btn btn-secondary material-icons">edit</a>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <div class="card-footer">
+  </div>
+</div>

@@ -60,15 +60,15 @@
               }
             </td>
             <td class="align-middle">
-              @switch (user.Status.ToString()) {
+              @switch (user.UserStatus.ToString()) {
                 case "Declined":
-                  <span class="badge bg-danger">@Html.DisplayFor(m => user.Status)</span>
+                  <span class="badge bg-danger">@Html.DisplayFor(m => user.UserStatus)</span>
                   break;
                 case "Accepted":
-                  <span class="badge bg-success">@Html.DisplayFor(m => user.Status)</span>
+                  <span class="badge bg-success">@Html.DisplayFor(m => user.UserStatus)</span>
                   break;
                 case "Pending":
-                  <span class="badge bg-warning">@Html.DisplayFor(m => user.Status)</span>
+                  <span class="badge bg-warning">@Html.DisplayFor(m => user.UserStatus)</span>
                   break;
               }
             </td>

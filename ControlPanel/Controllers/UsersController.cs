@@ -50,7 +50,7 @@ public class UsersController : Controller {
                     user = new(){
                         UserName = res.UserName,
                         Email = res.Email,
-                        Status = res.Status,
+                        UserStatus = res.UserStatus,
                         UserGroup = res.UserGroup
                     };
                     
@@ -60,7 +60,7 @@ public class UsersController : Controller {
                     
                     user.UserName = res.UserName;
                     user.Email = res.Email;
-                    user.Status = res.Status;
+                    user.UserStatus = res.UserStatus;
                     user.UserGroup = res.UserGroup;
 
                     _context.Users.Update(user);

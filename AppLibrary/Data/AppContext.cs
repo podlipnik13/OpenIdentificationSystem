@@ -29,7 +29,7 @@ public class OISContext : DbContext {
             e.Property(e => e.Email).HasMaxLength(100);
             e.Property(e => e.Password).HasMaxLength(100);
             e.Property(e => e.UserGroup);
-            e.Property(e => e.Status);  
+            e.Property(e => e.UserStatus);  
         });
 
         modelBuilder.Entity<InspectorAuthorizedDocumentType>(e => {

@@ -2,7 +2,7 @@
 
 public class Inspection {
     public int Id { get; set; }
-    public bool IsValid { get; set; }
+    public bool IsValid { get; set; } = false;
     public DateTime ValidatonStartTime { get; set; }
 
     public int UserId { get; set; }

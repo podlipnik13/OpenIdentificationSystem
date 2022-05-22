@@ -18,23 +18,23 @@ public static class DbInitializer {
                 new User {
                     UserName="Admin",
                     Email="",
-                    Password="772025032c97cdc4c452ec2b8ba78811741bd092b4af202f13424fd4f7e8bc80", //Admin
+                    Password= Cryptography.HashThis("Admin"),
                     UserGroup= UserGroup.Admin,
-                    Status= Status.Accepted
+                    UserStatus= UserStatus.Accepted
                 },
                 new User {
                     UserName="Dummy1",
                     Email="",
-                    Password="c126c2dc66f715fd4e4f5cfc563efda894740bc6eb04776d2a63c564ff67b7f9", //Dummy123
+                    Password= Cryptography.HashThis("Dummy123"),
                     UserGroup=UserGroup.Inspectee,
-                    Status= Status.Accepted
+                    UserStatus= UserStatus.Accepted
                 },
                 new User {
                     UserName="Inspector1",
                     Email="",
-                    Password="beda563417c9561ad7c15431783153d7e9dcf32c8d0decf635a6ef45fa3317db", //Inspector123
+                    Password= Cryptography.HashThis("Inspector123"),
                     UserGroup=UserGroup.Inspector,
-                    Status= Status.Accepted,
+                    UserStatus= UserStatus.Accepted,
 
                 }
             };
@@ -85,7 +85,7 @@ public static class DbInitializer {
             documentParameters = new() {
                 new DocumentParameter {
                     Label="Kátyaszám",
-                    DataType= DataType.number,
+                    DataType= DataType.number_int,
                     isIdentifier=true,
                     DocumentTypeId = documentTypes.First().Id
                 },
@@ -121,7 +121,7 @@ public static class DbInitializer {
                 },
                 new DocumentParameter {
                     Label="Azonosító szám",
-                    DataType=DataType.number,
+                    DataType=DataType.number_int,
                     isIdentifier=true,
                     DocumentTypeId = documentTypes.First().Id
                 }
@@ -228,5 +228,28 @@ public static class DbInitializer {
             context.DocumentParameterValues.AddRange(documentParameterValues);
             context.SaveChanges();
         }
+    
+    
+        // Look for any System Parameters
+
+        if (!context.SystemParameters.Any()) {
+
+            List<SystemParameter> systemParameters = new(){
+                
+                new SystemParameter {
+                    Property = "ServiceProviderName",
+                    Value = "MyCompany"
+                },
+                new SystemParameter {
+                    Property = "ApiAddress",
+                    Value = "127.0.0.1"
+                }
+            };
+            
+            context.SystemParameters.AddRange(systemParameters);
+            context.SaveChanges();
+        }
+    
+    
     }
 }

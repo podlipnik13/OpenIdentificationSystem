@@ -1,6 +1,9 @@
 - remove cascade delete
 - add aft validation
 - add logger
-- parse ParamValues (int,String,date)
 - parameterValues with blank values when new document is assigned to user
+- Variable inspection time "expiresIn"?
+- getToken addminutes -> addSeconds
+- 
+
    
