@@ -2,3 +2,6 @@ AppLibrary/bin/*
 AppLibrary/obj/*
 ControlPanel/obj/*
 ControlPanel/bin/*
+Server/obj/*
+Server/bin/*
+
