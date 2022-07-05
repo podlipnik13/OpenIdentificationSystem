@@ -1,0 +1,37 @@
+﻿@page "/fetchdata"
+@using System.Text.Json
+@inject HttpClient Http
+
+
+@foreach (var c in documents)
+{
+    @c
+}
+
+@code {
+    private List<Document> documents;
+    private Response response;
+    private JsonElement a;
+    private Document doc;
+
+    protected override async Task OnInitializedAsync()
+    {
+        response = await Http.GetFromJsonAsync<Response>("https://localhost:7166/Api/User/GetDocuments?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJFeHBpcmUiOjE2NTM0ODkwNTEsIlVzZXJJZCI6Mn0.3Ky_PzIeJc6Lflfq_qSp3wu103SP850diqy1c1QOybI");
+        a = (JsonElement)response.Data;
+        
+        foreach (var i in a.EnumerateArray()) {
+            var x = JsonSerializer.Deserialize<Document>(i);
+            Document doc = new(){
+                Id = x.Id,
+                IssueDate = x.IssueDate,
+                ValidThrough = x.ValidThrough
+            };
+            
+            documents.Append(doc);
+        }
+
+    }
+
+}
+
+

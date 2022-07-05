@@ -4,4 +4,8 @@ ControlPanel/obj/*
 ControlPanel/bin/*
 Server/obj/*
 Server/bin/*
+Mobile/obj/*
+Mobile/bin/*
+.idea
+.vscode
 

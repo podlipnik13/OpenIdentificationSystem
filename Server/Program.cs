@@ -10,6 +10,15 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<OISContext>(options =>
   options.UseNpgsql(builder.Configuration.GetConnectionString("npgsql")));
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(
+        policy =>
+        {
+            policy.WithOrigins("https://localhost:5001");
+        });
+});
+
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddAuthentication();
@@ -28,7 +37,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.UseRouting();
-
+app.UseCors();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

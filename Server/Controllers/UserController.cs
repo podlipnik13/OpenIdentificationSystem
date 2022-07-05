@@ -1,10 +1,11 @@
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 
 namespace Server.Controllers;
 
+[EnableCors]
 [ApiController]
 [Route("Api/[controller]")]
 public class UserController : ControllerBase
@@ -13,7 +14,7 @@ public class UserController : ControllerBase
     public UserController(OISContext context) {
         _context = context;
     }
-
+    
     [HttpGet("Register")]
     public async Task<ActionResult<Response>> Register([FromQuery] UserPayload userPayload) {
 
@@ -74,5 +75,35 @@ public class UserController : ControllerBase
     public Response GetToken([FromQuery] UserPayload res) {
         return Security.GetToken(_context,res);
     }
-}
 
+    [EnableCors(default)]
+    [HttpGet("GetDocuments")]
+    public async Task<ActionResult<Response>> GetDocuments(string token){
+        Response response = new();
+
+        var r = Security.Authenticate(token);
+        if(r.Status != ResponseStatus.OK){
+            response.Status = r.Status;
+            response.Message = r.Message;
+            return response;
+        }
+        try {
+            int userId = (int)r.Data;
+            
+            List<Document> document = await _context.Documents
+                .Where(d => d.UserId == userId)
+                .ToListAsync();
+            
+            if(document == null) throw new Exception("No documents found!");
+
+            response.Data = document;
+            response.Status = ResponseStatus.OK;
+
+        } catch (Exception ex){
+            response.Status = ResponseStatus.Error;
+            response.Message = ex.Message;
+        }
+        return response;
+    }
+
+}

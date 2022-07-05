@@ -156,7 +156,7 @@ public static class DbInitializer {
                     ValidThrough = DateTime.Parse("2022-12-29").ToUniversalTime(),
                     DocumentStatus = DocumentStatus.Pending,
                     DocumentTypeId = documentTypes.First().Id,
-                    UserId = users.First().Id
+                    UserId = users.ElementAt(1).Id
                 },
                 //incorrect type
                 new Document {
